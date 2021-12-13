@@ -1,0 +1,9 @@
+{
+  "name": "cadastro-pacientes",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless-offline": "^8.3.1"
+  }
+}
