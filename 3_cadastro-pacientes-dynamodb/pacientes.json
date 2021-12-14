@@ -1,0 +1,52 @@
+{
+  "PACIENTES": [
+    {
+      "PutRequest": {
+        "Item": {
+          "data_nascimento": {
+            "S": "1984-01-01"
+          },
+          "email": {
+            "S": "nicolas@direct.one"
+          },
+          "nome": {
+            "S": "Nicolas"
+          },
+          "paciente_id": {
+            "S": "eroavn3189"
+          },
+          "status": {
+            "BOOL": true
+          },
+          "telefone": {
+            "S": "11999995555"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "data_nascimento": {
+            "S": "1984-01-01"
+          },
+          "email": {
+            "S": "jose@direct.one"
+          },
+          "nome": {
+            "S": "Jose"
+          },
+          "paciente_id": {
+            "S": "aeri38bhnf12"
+          },
+          "status": {
+            "BOOL": true
+          },
+          "telefone": {
+            "S": "11999995555"
+          }
+        }
+      }
+    }
+  ]
+}
