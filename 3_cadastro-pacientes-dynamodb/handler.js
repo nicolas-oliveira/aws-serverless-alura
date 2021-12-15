@@ -84,3 +84,100 @@ module.exports.obterPaciente = async (event) => {
 };
 // --------------------------------------------------------------------------//
 // --------------------------------------------------------------------------//
+
+module.exports.cadastrarPaciente = async (event) => {
+  try {
+    let dados = JSON.parse(event.body);
+
+    const { data_nascimento, nome, email, telefone } = dados;
+
+    const paciente = {
+      data_nascimento,
+      paciente_id: Math.random().toString(16).substr(2, 10),
+      nome,
+      email,
+      telefone,
+      status: true,
+      criado_em: new Date().getTime(),
+      atualizado_em: new Date().getTime(),
+    };
+
+    await dynamoDb.put({ TableName: "PACIENTES", Item: paciente }).promise();
+
+    return {
+      statusCode: 201,
+      body: JSON.stringify(paciente, null, 2),
+    };
+  } catch (err) {
+    console.log(
+      "-------------------------------ERROR-----------------------------------------"
+    );
+
+    console.log("Error", err);
+    return {
+      statusCode: err.statusCode ? err.statusCode : 500,
+      body: JSON.stringify({
+        error: err.name ? err.name : "Exception",
+        message: err.message ? err.message : "Unknown error",
+      }),
+    };
+  }
+};
+
+// --------------------------------------------------------------------------//
+// --------------------------------------------------------------------------//
+
+module.exports.atualizarPaciente = async (event) => {
+  const { pacienteId } = event.pathParameters;
+  try {
+    let dados = JSON.parse(event.body);
+
+    const { nome, data_nascimento, email, telefone } = dados;
+
+    await dynamoDb
+      .update({
+        ...params,
+        Key: {
+          paciente_id: pacienteId,
+        },
+        UpdateExpression:
+          "SET nome = :nome, data_nascimento = :dt, email = :email," +
+          "telefone = :telefone, atualizado_em = :atualizado_em",
+        ConditionExpression: "attribute_exists(paciente_id)",
+        ExpressionAttributeValues: {
+          ":nome": nome,
+          ":dt": data_nascimento,
+          ":email": email,
+          ":telefone": telefone,
+          ":atualizado_em": new Date().getTime(),
+        },
+      })
+      .promise();
+    return {
+      statusCode: 201,
+    };
+  } catch (err) {
+    console.log(
+      "-------------------------------ERROR-----------------------------------------"
+    );
+
+    console.log("Error", err);
+
+    let error = err.name ? err.name : "Exception";
+    let message = err.message ? err.message : "Unknown error";
+    let statusCode = err.statusCode ? err.statusCode : 500;
+
+    if (error == "ConditionalCheckFailedException") {
+      error = "Paciente não existe";
+      message = `Recurso com o ID ${pacienteId} não existe e não pode ser atualizado`;
+      statusCode = 404;
+    }
+    return {
+      statusCode: err.statusCode ? err.statusCode : 500,
+      body: JSON.stringify({
+        error,
+        message,
+      }),
+    };
+  }
+};

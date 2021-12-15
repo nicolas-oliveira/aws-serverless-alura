@@ -35,13 +35,24 @@ functions:
       - http:
           path: pacientes
           method: get
-
   obterPaciente:
     handler: handler.obterPaciente
     events:
       - http:
           path: pacientes/{pacienteId}
           method: get
+  cadastrarPaciente:
+    handler: handler.cadastrarPaciente
+    events:
+      - http:
+          path: pacientes
+          method: post
+  atualizarPaciente:
+    handler: handler.atualizarPaciente
+    events:
+      - http:
+          path: pacientes/{pacienteId}
+          method: put
 
 resources:
   Resources:
