@@ -1,10 +1,10 @@
 "use strict";
 
-const pacientes = [
-  { id: 1, nome: "Maria", dataNascimento: "1984-11-01" },
-  { id: 2, nome: "Joao", dataNascimento: "1980-01-16" },
-  { id: 3, nome: "Jose", dataNascimento: "1998-06-06" },
-];
+// const pacientes = [
+//   { id: 1, nome: "Maria", dataNascimento: "1984-11-01" },
+//   { id: 2, nome: "Joao", dataNascimento: "1980-01-16" },
+//   { id: 3, nome: "Jose", dataNascimento: "1998-06-06" },
+// ];
 
 const AWS = require("aws-sdk");
 
@@ -154,7 +154,52 @@ module.exports.atualizarPaciente = async (event) => {
       })
       .promise();
     return {
-      statusCode: 201,
+      statusCode: 200,
+    };
+  } catch (err) {
+    console.log(
+      "-------------------------------ERROR-----------------------------------------"
+    );
+
+    console.log("Error", err);
+
+    let error = err.name ? err.name : "Exception";
+    let message = err.message ? err.message : "Unknown error";
+    let statusCode = err.statusCode ? err.statusCode : 500;
+
+    if (error == "ConditionalCheckFailedException") {
+      error = "Paciente não existe";
+      message = `Recurso com o ID ${pacienteId} não existe e não pode ser atualizado`;
+      statusCode = 404;
+    }
+    return {
+      statusCode: err.statusCode ? err.statusCode : 500,
+      body: JSON.stringify({
+        error,
+        message,
+      }),
+    };
+  }
+};
+
+// --------------------------------------------------------------------------//
+// --------------------------------------------------------------------------//
+
+module.exports.excluirPaciente = async (event) => {
+  const { pacienteId } = event.pathParameters;
+  try {
+    await dynamoDb
+      .delete({
+        ...params,
+        Key: {
+          paciente_id: pacienteId,
+        },
+        ConditionExpression: "attribute_exists(paciente_id)",
+      })
+      .promise();
+
+    return {
+      statusCode: 204,
     };
   } catch (err) {
     console.log(
